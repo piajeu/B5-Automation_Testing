@@ -22,7 +22,23 @@ public class CoursePage {
         PageFactory.initElements(driver, this);
     }
 
+    public void checkForReload() {
+        try {
+            Thread.sleep(2000); // Wait a moment initially to let it load
+            String pageSource = driver.getPageSource();
+            if (!pageSource.contains("Lanjutkan Kursus") && !pageSource.contains("Lanjutkan")) {
+                System.out.println("Course details not fully loaded, refreshing page...");
+                driver.navigate().refresh();
+                Thread.sleep(5000); // Wait 5 seconds after refresh
+                PageFactory.initElements(driver, this);
+            }
+        } catch (Exception e) {
+            // Ignore
+        }
+    }
+
     public void clickLanjutkanKursus() {
+        checkForReload();
         org.openqa.selenium.support.ui.WebDriverWait wait = new org.openqa.selenium.support.ui.WebDriverWait(driver, java.time.Duration.ofSeconds(10));
         wait.until(org.openqa.selenium.support.ui.ExpectedConditions.elementToBeClickable(btnLanjutkanKursus));
         

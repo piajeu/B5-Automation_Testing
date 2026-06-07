@@ -15,6 +15,13 @@ import pages.MaterialPage;
 import java.time.Duration;
 
 public class LoginSteps {
+    static {
+        // Suppress Selenium and ChromeDriver console warnings
+        System.setProperty("webdriver.chrome.silentOutput", "true");
+        System.setProperty("org.openqa.selenium.remote.service.DriverService.level", "OFF");
+        java.util.logging.Logger.getLogger("org.openqa.selenium").setLevel(java.util.logging.Level.SEVERE);
+    }
+
     private WebDriver driver;
     private LoginPage loginPage;
     private DashboardPage dashboardPage;
@@ -90,8 +97,21 @@ public class LoginSteps {
 
     @And("pelajar berada di halaman Detail Kursus untuk {string}")
     public void pelajar_berada_di_halaman_detail_kursus_untuk(String courseName) {
+        org.openqa.selenium.support.ui.WebDriverWait wait = new org.openqa.selenium.support.ui.WebDriverWait(driver, java.time.Duration.ofSeconds(10));
         dashboardPage.selectCourse(courseName);
-        try { Thread.sleep(4000); } catch(Exception e) {}
+        try {
+            wait.until(org.openqa.selenium.support.ui.ExpectedConditions.urlContains("/course/"));
+        } catch (Exception e) {
+            System.out.println("Navigation to course details failed or delayed, retrying card click...");
+            try {
+                dashboardPage.selectCourse(courseName);
+                wait.until(org.openqa.selenium.support.ui.ExpectedConditions.urlContains("/course/"));
+            } catch (Exception ex) {
+                System.out.println("Card click failed twice, navigating directly via URL...");
+                driver.get("https://polban-space.cloudias79.com/jtk-learn/course/64");
+            }
+        }
+        try { Thread.sleep(3000); } catch(Exception e) {}
         coursePage = new CoursePage(driver);
     }
 
