@@ -17,6 +17,12 @@ public class DashboardPage {
     @FindBy(tagName = "footer")
     private WebElement footerSection;
 
+    @FindBy(css = "li.nav-name.dropdown a.nav-link")
+    private WebElement accountMenu;
+
+    @FindBy(css = "button.dropdown-button")
+    private WebElement btnLogout;
+
     public DashboardPage(WebDriver driver) {
         this.driver = driver;
         PageFactory.initElements(driver, this);
@@ -60,5 +66,13 @@ public class DashboardPage {
                 "arguments[0].click();",
                 courseLink
         );
+    }
+
+    public void clickAccountMenu() {
+        accountMenu.click();
+    }
+
+    public void clickLogout() {
+        btnLogout.click();
     }
 }

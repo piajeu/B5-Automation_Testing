@@ -39,4 +39,11 @@ public class LoginPage {
     public void clickMasuk() {
         btnMasuk.click();
     }
+
+    public boolean isLoginPageDisplayed() {
+
+        return txtEmail.isDisplayed()
+                && txtPassword.isDisplayed()
+                && btnMasuk.isDisplayed();
+    }
 }
