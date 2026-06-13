@@ -1,70 +1,153 @@
 package pages;
 
-import org.openqa.selenium.By;
+import java.time.Duration;
+
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
 public class CourseOverviewPage {
 
-    WebDriver driver;
-
-    @FindBy(css = "input[type='search']")
-    private WebElement txtSearchCourse;
-
-    @FindBy(id = "enrollment_code")
-    private WebElement txtEnrollmentCode;
-
-    @FindBy(xpath = "//button[contains(text(),'Daftar')]")
-    private WebElement btnDaftar;
-
-    @FindBy(className = "alert-success")
-    private WebElement successMessage;
+    private WebDriver driver;
+    private WebDriverWait wait;
 
     public CourseOverviewPage(WebDriver driver) {
 
         this.driver = driver;
 
+        this.wait =
+                new WebDriverWait(
+                        driver,
+                        Duration.ofSeconds(10)
+                );
+
         PageFactory.initElements(driver, this);
     }
 
-    public void searchCourse(String courseName) {
+    // ==========================
+    // ELEMENTS
+    // ==========================
 
-        txtSearchCourse.clear();
+    @FindBy(css = "input[placeholder='Kode Pendaftaran']")
+    private WebElement txtRegistrationCode;
 
-        txtSearchCourse.sendKeys(courseName);
-    }
+    @FindBy(css = "button.button-enroll")
+    private WebElement btnDaftar;
 
-    public void selectCourse(String courseName) {
+    // Locator generic popup sukses
 
-        WebElement courseCard =
-                driver.findElement(
-                        By.xpath("//*[contains(text(),'" + courseName + "')]")
-                );
+    @FindBy(xpath = "//*[contains(text(),'Pendaftaran berhasil')]")
+    private WebElement successMessage;
 
-        courseCard.click();
-    }
+    // ==========================
+    // ACTIONS
+    // ==========================
 
-    public void enterEnrollmentCode(String code) {
+    public void enterRegistrationCode(String code) {
 
-        txtEnrollmentCode.clear();
+        wait.until(
+                ExpectedConditions.visibilityOf(
+                        txtRegistrationCode
+                )
+        );
 
-        txtEnrollmentCode.sendKeys(code);
+        scrollToElement(txtRegistrationCode);
+
+        txtRegistrationCode.clear();
+
+        txtRegistrationCode.sendKeys(code);
     }
 
     public void clickDaftar() {
 
-        btnDaftar.click();
+        wait.until(
+                ExpectedConditions.elementToBeClickable(
+                        btnDaftar
+                )
+        );
+
+        scrollToElement(btnDaftar);
+
+        try {
+
+            btnDaftar.click();
+
+        } catch (Exception e) {
+
+            JavascriptExecutor js =
+                    (JavascriptExecutor) driver;
+
+            js.executeScript(
+                    "arguments[0].click();",
+                    btnDaftar
+            );
+        }
+    }
+
+    // ==========================
+    // VALIDATIONS
+    // ==========================
+
+    public boolean isCourseOverviewDisplayed() {
+
+        try {
+
+            wait.until(
+                    ExpectedConditions.visibilityOf(
+                            txtRegistrationCode
+                    )
+            );
+
+            return txtRegistrationCode.isDisplayed();
+
+        } catch (Exception e) {
+
+            return false;
+        }
     }
 
     public String getSuccessMessage() {
 
-        return successMessage.getText();
+        try {
+
+            wait.until(
+                    ExpectedConditions.visibilityOf(
+                            successMessage
+                    )
+            );
+
+            return successMessage.getText();
+
+        } catch (Exception e) {
+
+            return "";
+        }
     }
 
     public String getCurrentUrl() {
 
         return driver.getCurrentUrl();
+    }
+
+    // ==========================
+    // HELPER
+    // ==========================
+
+    private void scrollToElement(
+            WebElement element) {
+
+        JavascriptExecutor js =
+                (JavascriptExecutor) driver;
+
+        js.executeScript(
+                "arguments[0].scrollIntoView({block:'center'});",
+                element
+        );
     }
 }

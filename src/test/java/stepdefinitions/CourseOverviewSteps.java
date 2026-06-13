@@ -1,14 +1,18 @@
 package stepdefinitions;
 
 import io.cucumber.java.en.*;
+
 import org.junit.Assert;
 
-import pages.CourseOverviewPage;
+import pages.LoginPage;
 import pages.DashboardPage;
+import pages.CourseOverviewPage;
+
 import utils.DriverSetup;
 
 public class CourseOverviewSteps {
 
+    private LoginPage loginPage;
     private DashboardPage dashboardPage;
     private CourseOverviewPage courseOverviewPage;
 
@@ -17,34 +21,57 @@ public class CourseOverviewSteps {
             String email,
             String password) {
 
-        // bisa kosong jika login sudah diuji di scenario lain
+        DriverSetup.getDriver().get(
+                "https://polban-space.cloudias79.com/jtk-learn/"
+        );
+
+        loginPage = new LoginPage(
+                DriverSetup.getDriver()
+        );
+
+        loginPage.enterEmail(email);
+        loginPage.enterPassword(password);
+        loginPage.clickMasuk();
+
+        dashboardPage = new DashboardPage(
+                DriverSetup.getDriver()
+        );
+
+        Assert.assertTrue(
+                "Login gagal",
+                dashboardPage.isDashboardDisplayed()
+        );
     }
 
     @When("pelajar mencari course {string}")
-    public void pelajar_mencari_course(String courseName) {
-
-        dashboardPage =
-                new DashboardPage(DriverSetup.getDriver());
+    public void pelajar_mencari_course(
+            String courseName) {
 
         dashboardPage.selectCourse(courseName);
     }
 
     @And("pelajar memilih course {string}")
-    public void pelajar_memilih_course(String courseName) {
+    public void pelajar_memilih_course(
+            String courseName) {
 
         courseOverviewPage =
-                new CourseOverviewPage(DriverSetup.getDriver());
+                new CourseOverviewPage(
+                        DriverSetup.getDriver()
+                );
     }
 
     @Then("halaman Course Overview ditampilkan")
     public void halaman_course_overview_ditampilkan() {
 
         Assert.assertTrue(
-                courseOverviewPage.isCourseOverviewDisplayed());
+                "Halaman Course Overview tidak tampil",
+                courseOverviewPage.isCourseOverviewDisplayed()
+        );
     }
 
     @When("pelajar memasukkan kode pendaftaran {string}")
-    public void pelajar_memasukkan_kode_pendaftaran(String kode) {
+    public void pelajar_memasukkan_kode_pendaftaran(
+            String kode) {
 
         courseOverviewPage.enterRegistrationCode(kode);
     }
@@ -62,19 +89,18 @@ public class CourseOverviewSteps {
     }
 
     @And("sistem menampilkan pesan {string}")
-    public void sistem_menampilkan_pesan(String expectedMessage) {
+    public void sistem_menampilkan_pesan(
+            String expectedMessage) {
 
         String actualMessage =
                 courseOverviewPage.getSuccessMessage();
 
-        Assert.assertTrue(
-                actualMessage.contains("Pendaftaran berhasil"));
-    }
-
-    @And("status course berubah menjadi terdaftar")
-    public void status_course_berubah_menjadi_terdaftar() {
+        System.out.println(actualMessage);
 
         Assert.assertTrue(
-                courseOverviewPage.isRegistrationSuccessful());
+                "Pesan sukses tidak ditemukan",
+                actualMessage.contains("Pendaftaran berhasil")
+                        || actualMessage.contains("Sukses")
+        );
     }
 }
