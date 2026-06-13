@@ -22,6 +22,10 @@ public class LoginPage {
         PageFactory.initElements(driver, this);
     }
 
+    public void openLoginPage(String url) {
+        driver.get(url);
+    }
+
     public void enterEmail(String email) {
         txtEmail.clear();
         txtEmail.sendKeys(email);
