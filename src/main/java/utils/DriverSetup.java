@@ -21,6 +21,13 @@ public class DriverSetup {
 
             options.addArguments("--incognito");
 
+            String headlessProp = System.getProperty("headless", "true");
+            if (Boolean.parseBoolean(headlessProp)) {
+                options.addArguments("--headless=new");
+                options.addArguments("--disable-gpu");
+                options.addArguments("--window-size=1920,1080");
+            }
+
             options.addArguments("--disable-save-password-bubble");
 
             options.addArguments("--disable-features=PasswordCheck");

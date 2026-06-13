@@ -35,12 +35,20 @@ public class DashboardPage {
 
     // Mengambil teks navigasi header
     public String getHeaderNavigationText() {
-        return headerNav.getText();
+        String text = headerNav.getText();
+        if (text == null || text.trim().isEmpty()) {
+            text = headerNav.getAttribute("textContent");
+        }
+        return text;
     }
 
     // Mengambil teks footer
     public String getFooterText() {
-        return footerSection.getText();
+        String text = footerSection.getText();
+        if (text == null || text.trim().isEmpty()) {
+            text = footerSection.getAttribute("textContent");
+        }
+        return text;
     }
 
     // Mengambil URL halaman saat ini
@@ -69,10 +77,20 @@ public class DashboardPage {
     }
 
     public void clickAccountMenu() {
-        accountMenu.click();
+        try {
+            accountMenu.click();
+        } catch (Exception e) {
+            JavascriptExecutor js = (JavascriptExecutor) driver;
+            js.executeScript("arguments[0].click();", accountMenu);
+        }
     }
 
     public void clickLogout() {
-        btnLogout.click();
+        try {
+            btnLogout.click();
+        } catch (Exception e) {
+            JavascriptExecutor js = (JavascriptExecutor) driver;
+            js.executeScript("arguments[0].click();", btnLogout);
+        }
     }
 }

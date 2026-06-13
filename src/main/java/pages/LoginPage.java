@@ -46,4 +46,19 @@ public class LoginPage {
                 && txtPassword.isDisplayed()
                 && btnMasuk.isDisplayed();
     }
+
+    // Locator popup SweetAlert error
+    @FindBy(id = "swal2-title")
+    private WebElement errorTitle;
+
+    @FindBy(id = "swal2-html-container")
+    private WebElement errorMessage;
+
+    public String getErrorTitle() {
+        return errorTitle.getText();
+    }
+
+    public String getErrorMessage() {
+        return errorMessage.getText();
+    }
 }

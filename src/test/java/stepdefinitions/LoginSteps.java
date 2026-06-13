@@ -60,6 +60,7 @@ public class LoginSteps {
 
         String actualNavText =
                 dashboardPage.getHeaderNavigationText();
+        System.out.println("DEBUG ACTUAL NAV TEXT: [" + actualNavText + "]");
 
         String[] menus =
                 expectedNavText.split("\\s*\\|\\s*");
@@ -82,6 +83,23 @@ public class LoginSteps {
         Assert.assertTrue(
                 "Footer tidak sesuai",
                 actualFooterText.contains(expectedFooterText)
+        );
+    }
+
+    @Then("sistem memvalidasi kredensial, login gagal, dan halaman tetap di halaman Login")
+    public void sistem_memvalidasi_kredensial_login_gagal_dan_halaman_tetap_di_halaman_login() {
+        Assert.assertTrue(
+                "Halaman berpindah dari halaman Login",
+                loginPage.isLoginPageDisplayed()
+        );
+    }
+
+    @And("sistem menampilkan pesan error login {string}")
+    public void sistem_menampilkan_pesan_error_login(String expectedMessage) {
+        Assert.assertEquals(
+                "Pesan error tidak cocok!",
+                expectedMessage,
+                loginPage.getErrorMessage()
         );
     }
 }
