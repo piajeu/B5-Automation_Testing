@@ -10,7 +10,6 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import pages.LoginPage;
 import pages.DashboardPage;
 import pages.CoursePage;
-import pages.MaterialPage;
 
 import java.time.Duration;
 
