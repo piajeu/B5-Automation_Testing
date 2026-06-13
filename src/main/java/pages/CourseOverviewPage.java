@@ -45,6 +45,12 @@ public class CourseOverviewPage {
     @FindBy(xpath = "//*[contains(text(),'Pendaftaran berhasil')]")
     private WebElement successMessage;
 
+    @FindBy(id = "swal2-title")
+    private WebElement errorTitle;
+
+    @FindBy(id = "swal2-html-container")
+    private WebElement errorMessage;
+
     // ==========================
     // ACTIONS
     // ==========================
@@ -62,6 +68,19 @@ public class CourseOverviewPage {
         txtRegistrationCode.clear();
 
         txtRegistrationCode.sendKeys(code);
+    }
+
+    public void leaveRegistrationCodeEmpty() {
+
+        wait.until(
+                ExpectedConditions.visibilityOf(
+                        txtRegistrationCode
+                )
+        );
+
+        scrollToElement(txtRegistrationCode);
+
+        txtRegistrationCode.clear();
     }
 
     public void clickDaftar() {
@@ -149,5 +168,27 @@ public class CourseOverviewPage {
                 "arguments[0].scrollIntoView({block:'center'});",
                 element
         );
+    }
+
+    public String getErrorTitle() {
+
+        wait.until(
+                ExpectedConditions.visibilityOf(
+                        errorTitle
+                )
+        );
+
+        return errorTitle.getText();
+    }
+
+    public String getErrorMessage() {
+
+        wait.until(
+                ExpectedConditions.visibilityOf(
+                        errorMessage
+                )
+        );
+
+        return errorMessage.getText();
     }
 }

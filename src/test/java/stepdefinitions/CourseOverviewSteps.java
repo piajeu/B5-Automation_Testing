@@ -103,4 +103,37 @@ public class CourseOverviewSteps {
                         || actualMessage.contains("Sukses")
         );
     }
+
+    @When("pelajar tidak mengisi kode pendaftaran")
+    public void pelajar_tidak_mengisi_kode_pendaftaran() {
+
+        courseOverviewPage.leaveRegistrationCodeEmpty();
+    }
+
+    @Then("sistem menolak proses pendaftaran")
+    public void sistem_menolak_proses_pendaftaran() {
+
+        String title =
+                courseOverviewPage.getErrorTitle();
+
+        Assert.assertEquals(
+                "Kesalahan!",
+                title
+        );
+    }
+
+    @And("sistem menampilkan pesan error {string}")
+    public void sistem_menampilkan_pesan_error(
+            String expectedMessage) {
+
+        String actualMessage =
+                courseOverviewPage.getErrorMessage();
+
+        System.out.println(actualMessage);
+
+        Assert.assertEquals(
+                expectedMessage,
+                actualMessage
+        );
+    }
 }
