@@ -21,7 +21,7 @@ public class DriverSetup {
 
             options.addArguments("--incognito");
 
-            String headlessProp = System.getProperty("headless", "true");
+            String headlessProp = System.getProperty("headless", "false");
             if (Boolean.parseBoolean(headlessProp)) {
                 options.addArguments("--headless=new");
                 options.addArguments("--disable-gpu");
