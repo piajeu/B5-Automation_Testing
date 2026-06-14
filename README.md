@@ -8,7 +8,7 @@ Proyek ini adalah repositori otomatisasi pengujian (*Automation Testing*) untuk 
 
 Sebelum menjalankan pengujian, pastikan perangkat lokal Anda telah terinstal kakas (*tools*) berikut:
 
-1. **Java Development Kit (JDK)**: Versi 17 atau lebih tinggi.
+1. **Java Development Kit (JDK)**: Versi 17 atau lebih tinggi (direkomendasikan versi 21).
    - Verifikasi instalasi: `java -version`
 2. **Apache Maven**: Versi 3.8.x / 3.9.x atau lebih tinggi.
    - Verifikasi instalasi: `mvn -version`
@@ -19,40 +19,48 @@ Sebelum menjalankan pengujian, pastikan perangkat lokal Anda telah terinstal kak
 
 ## 📂 Struktur Proyek
 
-Proyek ini disusun dengan pola arsitektur Page Object Model (POM) untuk memisahkan logika interaksi elemen UI dengan skenario pengujian BDD:
+Proyek ini disusun dengan pola arsitektur Page Object Model (POM) untuk memisahkan logika interaksi elemen UI dengan skenario pengujian BDD secara rapi:
 
 ```text
 B5-Automation_Testing/
 ├── pom.xml                               # Manajemen dependensi Maven
 ├── README.md                             # Dokumentasi proyek
 └── src/
+    ├── main/
+    │   └── java/
+    │       ├── hooks/
+    │       │   └── Hooks.java            # Setup & teardown WebDriver sebelum/setelah skenario
+    │       ├── pages/                    # Web Elements & Interaction (POM - Page Factory)
+    │       │   ├── LoginPage.java        # Halaman Login & Validasi Error
+    │       │   ├── DashboardPage.java    # Halaman Dashboard Pelajar
+    │       │   └── CourseOverviewPage.java # Halaman Pendaftaran Kursus
+    │       └── utils/
+    │           └── DriverSetup.java      # Pengaturan instansiasi WebDriver & ChromeOptions
     └── test/
         ├── java/
-        │   ├── pages/                    # Web Elements & Interaction (POM)
-        │   │   ├── LoginPage.java        # Halaman Login
-        │   │   └── DashboardPage.java    # Halaman Dashboard Pelajar
-        │   │   ├── CoursePage.java       # Halaman Detail Kursus
-        │   │   └── MaterialPage.java     # Halaman Player Materi (dengan auto-refresh)
-        │   ├── stepdefinitions/          # Implementasi langkah-langkah skenario
-        │   │   └── LoginSteps.java
-        │   └── runners/                  # Eksekutor JUnit untuk Cucumber
-        │       └── TestRunner.java
+        │   ├── runners/                  # Eksekutor JUnit untuk Cucumber
+        │   │   └── TestRunner.java
+        │   └── stepdefinitions/          # Implementasi langkah-langkah skenario Gherkin
+        │       ├── LoginSteps.java
+        │       ├── LogoutSteps.java
+        │       └── CourseOverviewSteps.java
         └── resources/
-            └── features/                 # Berkas skenario pengujian BDD
-                ├── login.feature
-                └── akses_materi.feature
+            └── features/                 # Berkas skenario pengujian BDD (Gherkin)
+                ├── login.feature         # Fitur login (sukses & gagal)
+                ├── logout.feature        # Fitur logout
+                └── course_overview.feature # Fitur pendaftaran kelas / course
 ```
 
 ---
 
 ## 📝 Contoh Skenario Uji (BDD Feature)
 
-Berikut adalah contoh skenario uji positif untuk modul Autentikasi yang berada di berkas [login.feature](file:///D:/KULIAH/Semester6/Pengujian%20Perangkat%20Lunak/Praktek/Pertemuan14,15/B5-Automation_Testing/src/test/resources/features/login.feature):
+Berikut adalah contoh skenario uji positif untuk modul Autentikasi yang berada di berkas [login.feature](file:///d:/KULIAH/Semester6/Pengujian%20Perangkat%20Lunak/Praktek/Pertemuan14,15/B5-Automation_Testing/src/test/resources/features/login.feature):
 
 ```gherkin
-Feature: FR01 - Authentication
+Feature: FR01 - Login
 
-  Scenario: Pelajar berhasil login menggunakan email dan password yang terdaftar dan diarahkan ke dashboard Pelajar
+  Scenario: TC01 - Pelajar berhasil login menggunakan email dan password yang terdaftar dan diarahkan ke dashboard Pelajar
     Given aplikasi JTK Learn terbuka di halaman login "https://polban-space.cloudias79.com/jtk-learn/"
     When pelajar memasukkan email "devi123@example.com"
     And pelajar memasukkan password "devi123"
@@ -73,9 +81,14 @@ Buka terminal pada direktori root proyek `B5-Automation_Testing` lalu jalankan p
 mvn clean test
 ```
 
-*(Catatan: Jika variabel path Maven belum diset secara global pada Windows, Anda bisa menggunakan path absolut Java & Maven seperti contoh berikut:)*
+*(Catatan: Jika variabel path Maven belum diset secara global pada Windows, Anda bisa menggunakan path/variabel lingkungan seperti contoh berikut:)*
 ```cmd
 $env:JAVA_HOME="C:\Program Files\Java\jdk-21"; & "C:\Program Files\Maven\apache-maven-3.9.16\bin\mvn.cmd" clean test
+```
+
+Jika ingin menjalankan pengujian dalam mode headless (tanpa memunculkan antarmuka grafis browser Chrome):
+```cmd
+mvn test -Dheadless=true
 ```
 
 ### 2. Menjalankan Lewat IntelliJ IDEA
@@ -86,7 +99,21 @@ $env:JAVA_HOME="C:\Program Files\Java\jdk-21"; & "C:\Program Files\Maven\apache-
 
 ---
 
-## 💡 Fitur Penanganan Khusus: Auto-Refresh Halaman
-Pada modul **Akses Materi**, sistem React terkadang mengalami penundaan pemuatan API saat berpindah halaman secara dinamis sehingga memunculkan pesan kosong (*"There are no materials or quizzes for this course yet"*). 
+## 📊 Cara Melihat Hasil Pengujian (Test Reports)
 
-Untuk mengatasinya, proyek ini dilengkapi dengan **mekanisme auto-refresh** pada kelas `MaterialPage.java` yang akan mendeteksi kondisi tersebut dan melakukan muat ulang (*reload*) halaman secara otomatis demi menjamin kestabilan jalannya uji (*test stability*).
+Setelah pengujian dijalankan, berkas laporan pengujian secara otomatis akan dibuat di dalam folder `target/` sesuai dengan konfigurasi plugin pada [TestRunner.java](file:///d:/KULIAH/Semester6/Pengujian%20Perangkat%20Lunak/Praktek/Pertemuan14,15/B5-Automation_Testing/src/test/java/runners/TestRunner.java):
+
+1. **Laporan HTML**:
+   - Lokasi berkas: `target/cucumber-reports.html`
+   - Cara melihat: Buka folder `target/` di File Explorer, lalu klik ganda berkas `cucumber-reports.html` untuk membukanya di browser internet pilihan Anda (Chrome, Edge, Firefox, dll.). Laporan ini menyajikan ringkasan visual yang interaktif tentang skenario mana saja yang berhasil (*passed*) maupun gagal (*failed*).
+
+2. **Laporan JSON**:
+   - Lokasi berkas: `target/cucumber.json`
+   - Laporan mentah berformat JSON ini biasanya digunakan untuk kebutuhan integrasi dengan kakas pihak ketiga (CI/CD pipelines seperti Jenkins, GitLab CI, GitHub Actions) atau visualisasi eksternal.
+
+---
+
+## 💡 Fitur Penanganan Khusus: Penanganan Keadaan Sudah Terdaftar (Already Enrolled Bypassing)
+Pada modul **Course Overview** (pendaftaran kelas), terdapat situasi di mana akun pengujian sudah pernah terdaftar pada kelas target di sesi/eksekusi pengujian sebelumnya. Jika sistem mencoba mendaftar kembali secara paksa, pengujian berpotensi gagal karena halaman/elemen pendaftaran sudah tidak ditampilkan.
+
+Untuk menjamin idempotensi dan stabilitas jalannya pengujian (*test stability*), proyek ini dilengkapi dengan mekanisme bypass pada kelas [CourseOverviewSteps.java](file:///d:/KULIAH/Semester6/Pengujian%20Perangkat%20Lunak/Praktek/Pertemuan14,15/B5-Automation_Testing/src/test/java/stepdefinitions/CourseOverviewSteps.java). Sistem akan otomatis mendeteksi jika URL halaman berpindah langsung ke area `/course/` dan mengatur flag `isAlreadyEnrolled = true`, sehingga skenario langkah pengisian kode registrasi dan pendaftaran dilewati dengan sukses.
